@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var roman = map[string]int{
@@ -26,18 +27,13 @@ var roman = map[string]int{
 
 func readInputFromConsole() interface{} {
 	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Println("Введите первое значение: ")
+	fmt.Println("Введите ваше выражение: ")
 	scanner.Scan()
 	input := scanner.Text()
-	if numberOne, err := strconv.Atoi(input); err == nil {
-		fmt.Println("Введи симфол +, -, / или *: ")
-		scanner.Scan()
-		operator := scanner.Text()
-		fmt.Println("Введи второе значение: ")
-		scanner.Scan()
-		input = scanner.Text()
-		if numberTwo, err := strconv.Atoi(input); err == nil {
-			switch operator {
+	substrings := strings.Split(input, " ")
+	if numberOne, err := strconv.Atoi(substrings[0]); err == nil {
+		if numberTwo, err := strconv.Atoi(substrings[2]); err == nil {
+			switch substrings[1] {
 			case "+":
 				return numberOne + numberTwo
 			case "-":
@@ -65,34 +61,35 @@ func readInputFromConsole() interface{} {
 }
 
 func romanCalculate(input string) interface{} {
-	numberOne := roman[input]
-	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Println("Введи симфол +, -, / или *: ")
-	scanner.Scan()
-	operator := scanner.Text()
-	fmt.Println("Введи второе значение: ")
-	scanner.Scan()
-	numberTwo := roman[scanner.Text()]
-	switch operator {
-	case "+":
-		return numberOne + numberTwo
-	case "-":
-		if numberOne < numberTwo {
-			return "Вывод ошибки, так как в римской системе нет отрицательных чисел."
-		} else {
-			return numberOne - numberTwo
+	substrings := strings.Split(input, " ")
+	numberOne := roman[substrings[0]]
+	operator := substrings[1]
+	numberTwo := roman[substrings[2]]
+	if _, err := strconv.Atoi(substrings[0]); err != nil {
+		if _, err := strconv.Atoi(substrings[2]); err != nil {
+			switch operator {
+			case "+":
+				return numberOne + numberTwo
+			case "-":
+				if numberOne < numberTwo {
+					return "Вывод ошибки, так как в римской системе нет отрицательных чисел."
+				} else {
+					return numberOne - numberTwo
+				}
+			case "*":
+				return numberOne * numberTwo
+			case "/":
+				if numberOne < numberTwo {
+					return "Вывод ошибки, так как в римской системе нет значения ноль."
+				} else {
+					return numberOne / numberTwo
+				}
+			default:
+				return "Не понял что ты от меня хочешь, я такие данные не умею считать"
+			}
 		}
-	case "*":
-		return numberOne * numberTwo
-	case "/":
-		if numberOne < numberTwo {
-			return "Вывод ошибки, так как в римской системе нет значения ноль."
-		} else {
-			return numberOne / numberTwo
-		}
-	default:
-		return "Не понял что ты от меня хочешь, я такие данные не умею считать"
 	}
+	return "Ошибка: оба числа должны быть в римской системе"
 }
 
 func arabicToRoman(arabic int) string {
