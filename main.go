@@ -31,27 +31,36 @@ func readInputFromConsole() interface{} {
 	scanner.Scan()
 	input := scanner.Text()
 	substrings := strings.Split(input, " ")
-	if numberOne, err := strconv.Atoi(substrings[0]); err == nil {
-		if numberTwo, err := strconv.Atoi(substrings[2]); err == nil {
-			switch substrings[1] {
-			case "+":
-				return numberOne + numberTwo
-			case "-":
-				return numberOne - numberTwo
-			case "*":
-				return numberOne * numberTwo
-			case "/":
-				if numberTwo == 0 {
-					fmt.Println("Сорьки, на ноль не умею делить")
-					return 0
+	if len(substrings) == 3 {
+		if numberOne, err := strconv.Atoi(substrings[0]); err == nil {
+			if numberTwo, err := strconv.Atoi(substrings[2]); err == nil {
+				if numberOne <= 10 && numberTwo <= 10 {
+					switch substrings[1] {
+					case "+":
+						return numberOne + numberTwo
+					case "-":
+						return numberOne - numberTwo
+					case "*":
+						return numberOne * numberTwo
+					case "/":
+						if numberTwo == 0 {
+							fmt.Println("Сорьки, на ноль не умею делить")
+							return 0
+						}
+						return numberOne / numberTwo
+					default:
+						return "Не понял что за оператор для расчёта"
+					}
+				} else {
+					return "Числа в выражении должны быть от 1 до 10"
 				}
-				return numberOne / numberTwo
-			default:
-				return "Не понял что за оператор для расчёта"
 			}
+			return "Второе число ты ввел не арабскими цифрами, сори пока"
 		}
-		return "Второе число ты ввел не арабскими цифрами, сори пока"
+	} else {
+		return "Выражение должно быть по типу → 1 + 1 или I + I"
 	}
+
 	result := romanCalculate(input)
 	if val, ok := result.(int); ok {
 		return arabicToRoman(val)
@@ -65,31 +74,42 @@ func romanCalculate(input string) interface{} {
 	numberOne := roman[substrings[0]]
 	operator := substrings[1]
 	numberTwo := roman[substrings[2]]
-	if _, err := strconv.Atoi(substrings[0]); err != nil {
-		if _, err := strconv.Atoi(substrings[2]); err != nil {
-			switch operator {
-			case "+":
-				return numberOne + numberTwo
-			case "-":
-				if numberOne < numberTwo {
-					return "Вывод ошибки, так как в римской системе нет отрицательных чисел."
-				} else {
-					return numberOne - numberTwo
-				}
-			case "*":
-				return numberOne * numberTwo
-			case "/":
-				if numberOne < numberTwo {
-					return "Вывод ошибки, так как в римской системе нет значения ноль."
-				} else {
-					return numberOne / numberTwo
-				}
-			default:
-				return "Не понял что ты от меня хочешь, я такие данные не умею считать"
-			}
-		}
+	if numberOne == 0 || numberTwo == 0 || operator == "" {
+		return "В выражении ошибка, оно должно быть от I до X и по типу I + II"
 	}
-	return "Ошибка: оба числа должны быть в римской системе"
+
+	if len(substrings) == 3 {
+		if numberOne <= 10 {
+			if numberTwo <= 10 {
+				switch operator {
+				case "+":
+					return numberOne + numberTwo
+				case "-":
+					if numberOne < numberTwo {
+						return "Вывод ошибки, так как в римской системе нет отрицательных чисел."
+					} else {
+						return numberOne - numberTwo
+					}
+				case "*":
+					return numberOne * numberTwo
+				case "/":
+					if numberOne < numberTwo {
+						return "Вывод ошибки, так как в римской системе нет значения ноль."
+					} else {
+						return numberOne / numberTwo
+					}
+				default:
+					return "Не понял что ты от меня хочешь, я такие данные не умею считать"
+				}
+			} else {
+				return "Числа в выражении должны быть от 1 до 10"
+			}
+		} else {
+			return "Числа в выражении должны быть от 1 до 10"
+		}
+	} else {
+		return "Выражение должно быть по типу → 1 + 1 или I + I"
+	}
 }
 
 func arabicToRoman(arabic int) string {
